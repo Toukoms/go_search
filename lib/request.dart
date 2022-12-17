@@ -3,7 +3,7 @@ import 'dart:convert';
 
 http.Client client = http.Client();
 
-String host = "172.20.10.1";
+String host = "192.168.1.199";
 String port = "3000";
 
 Future<Map?> searchIntoWiki(label) async {
@@ -30,4 +30,14 @@ Future<Map?> searchIntoGoogle(label) async {
     return valueMap;
   }
   return null;
+}
+
+Future<Map?> searchActu() async {
+  Uri url = Uri.http('$host:$port', '/api/v1/google/news/Technologie');
+  print(url);
+  http.Response _response = await client.post(url);
+  print(_response.body);
+  Map valueMap = json.decode(_response.body);
+  // print(valueMap);
+  return valueMap;
 }

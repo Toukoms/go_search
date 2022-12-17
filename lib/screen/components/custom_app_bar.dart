@@ -9,7 +9,7 @@ class CustomAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(globalSpacing),
+      padding: const EdgeInsets.symmetric(vertical: globalPadding + 5, horizontal: globalSpacing - 5),
       decoration: const BoxDecoration(
           color: primaryColor,
           borderRadius: BorderRadius.only(
@@ -19,7 +19,7 @@ class CustomAppBar extends StatelessWidget {
         child: Column(
           children: [
             ListTile(
-              leading: Image.asset('images/go_share.png'),
+              leading: Image.asset('assets/images/go_share.png'),
             ),
           ],
         ),

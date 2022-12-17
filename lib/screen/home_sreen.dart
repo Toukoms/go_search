@@ -21,51 +21,13 @@ class _MyHomePageState extends State<MyHomePage> {
   String _lastWords = '';
   Map? data; // the data from the server
   bool isLoading = false;
+  Map? actu;
 
   @override
   void initState() {
+    fecthActuFromServer();
     _initSpeech();
     super.initState();
-  }
-
-  /// This has to happen only once per app
-  void _initSpeech() async {
-    _speechEnabled = await _speechToText.initialize();
-    // setState(() {});
-  }
-
-  void _startListening() async {
-    setState(() {
-      _lastWords = '';
-    });
-    await _speechToText.listen(
-        onResult: _onSpeechResult, pauseFor: const Duration(seconds: 2));
-    // setState(() {});
-  }
-
-  void _stopListening() async {
-    await _speechToText.stop();
-    setState(() {});
-  }
-
-  void _onSpeechResult(SpeechRecognitionResult result) async {
-    setState(() {
-      _lastWords = result.recognizedWords;
-    });
-
-    if (_speechToText.isNotListening && _lastWords != '') {
-      // fecth data from server
-      isLoading = true;
-      data = await searchIntoWiki(_lastWords);
-      isLoading = false;
-
-      //? print(result);
-      if (data!["data"]["text"] == "") {
-        data = await searchIntoGoogle(_lastWords);
-      } else {
-        tts.speak(data!['data']['text']);
-      }
-    }
   }
 
   @override
@@ -77,10 +39,16 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Column(
         children: <Widget>[
           CustomAppBar(),
+          SizedBox(
+            height: 20,
+          ),
           _speechToText.isListening
               ? Text("Listening...")
-              : Text("Tap to begin listening"),
+              : _speechEnabled
+                  ? Text("Tap to begin listening")
+                  : Text("The user has denied the use of speech recognition."),
           Text(_lastWords),
+          
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(globalPadding),
@@ -88,8 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 crossAxisCount: 2,
                 crossAxisSpacing: globalSpacing,
                 mainAxisSpacing: globalSpacing,
-                children: actuality
-                    .map((val) => Container(
+                children: actuality.map((val) => Container(
                         decoration: BoxDecoration(
                             color: Color.fromARGB(94, 134, 128, 128),
                             borderRadius: BorderRadius.circular(globalPadding)),
@@ -119,5 +86,65 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
+  }
+
+  void fecthActuFromServer()async {
+      actu = await searchActu();
+      print(actu);
+  }
+
+  /// This has to happen only once per app
+  void _initSpeech() async {
+    _speechEnabled = await _speechToText.initialize();
+    setState(() {});
+  }
+
+  void _startListening() async {
+    // Configuration de la détection de silence
+    // _speechToText.setSilenceDetection(
+    //   minimumSilenceDuration: Duration(seconds: 3),
+    //   pauseDetectionDelay: Duration(seconds: 2),
+    // );
+    _lastWords = '';
+    await _speechToText.listen(
+        onResult: _onSpeechResult,
+        pauseFor: const Duration(seconds: 2),
+        cancelOnError: true);
+    setState(() {});
+  }
+
+  void _stopListening() async {
+    await _speechToText.stop();
+    setState(() {});
+  }
+
+  void _onSpeechResult(SpeechRecognitionResult result) async {
+    setState(() {
+      _lastWords = result.recognizedWords;
+    });
+
+    // if (_speechToText.isNotListening && _lastWords != '') {
+    //   // fecth data from server
+    //   isLoading = true;
+    //   data = await searchIntoWiki(_lastWords);
+    //   isLoading = false;
+
+    //   //? print(result);
+    //   if (data!["data"]["text"] == "") {
+    //     data = await searchIntoGoogle(_lastWords);
+    //   } else {
+    //     tts.speak(data!['data']['text']);
+    //   }
+    //   setState(() {});
+    // }
+  }
+
+  void soundLevelListener(double level) {
+    print('Niveau de son : $level');
+  }
+
+  void recognitionCompleteListener() {
+    // Arrêt de la reconnaissance vocale lorsque la reconnaissance est terminée
+    _stopListening();
   }
 }
