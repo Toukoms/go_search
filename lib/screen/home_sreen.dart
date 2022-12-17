@@ -24,14 +24,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    super.initState();
     _initSpeech();
+    super.initState();
   }
 
   /// This has to happen only once per app
   void _initSpeech() async {
     _speechEnabled = await _speechToText.initialize();
-    setState(() {});
+    // setState(() {});
   }
 
   void _startListening() async {
@@ -40,7 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     await _speechToText.listen(
         onResult: _onSpeechResult, pauseFor: const Duration(seconds: 2));
-    setState(() {});
+    // setState(() {});
   }
 
   void _stopListening() async {
@@ -53,7 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _lastWords = result.recognizedWords;
     });
 
-    if (!_speechToText.isListening && _lastWords != '') {
+    if (_speechToText.isNotListening && _lastWords != '') {
       // fecth data from server
       isLoading = true;
       data = await searchIntoWiki(_lastWords);
@@ -77,6 +77,36 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Column(
         children: <Widget>[
           CustomAppBar(),
+          _speechToText.isListening
+              ? Text("Listening...")
+              : Text("Tap to begin listening"),
+          Text(_lastWords),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(globalPadding),
+              child: GridView.count(
+                crossAxisCount: 2,
+                crossAxisSpacing: globalSpacing,
+                mainAxisSpacing: globalSpacing,
+                children: actuality
+                    .map((val) => Container(
+                        decoration: BoxDecoration(
+                            color: Color.fromARGB(94, 134, 128, 128),
+                            borderRadius: BorderRadius.circular(globalPadding)),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(val['title']!,
+                                style: const TextStyle(
+                                    fontSize: 16,
+                                    overflow: TextOverflow.ellipsis))
+                          ],
+                        )))
+                    .toList(),
+              ),
+            ),
+          )
         ],
       ),
       floatingActionButton: FloatingActionButton(
