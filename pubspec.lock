@@ -62,13 +62,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.1"
-  flutter_staggered_grid_view:
+  flutter_share:
     dependency: "direct main"
     description:
-      name: flutter_staggered_grid_view
+      name: flutter_share
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.6.2"
+    version: "2.0.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -135,6 +135,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.8.0"
+  o_popup:
+    dependency: "direct main"
+    description:
+      name: o_popup
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.1"
   path:
     dependency: transitive
     description:

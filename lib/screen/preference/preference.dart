@@ -19,9 +19,11 @@ class _PreferenceState extends State<Preference> {
     return Scaffold(
       body: Column(children: [
         const CustomAppBar(),
+        const SizedBox(height: 30,),
+        Text("Selectioner un thème : ", style: Theme.of(context).textTheme.headline6,),
         Expanded(
           child: Container(
-            margin: EdgeInsets.all(globalPadding),
+            margin: EdgeInsets.all(globalSpacing),
             height: Size.height * 0.60,
             child: ListView.builder(
               itemCount: selection.length,
@@ -33,7 +35,7 @@ class _PreferenceState extends State<Preference> {
                       backgroundColor:
                           MaterialStatePropertyAll<Color>(primaryColor),
                       padding: MaterialStatePropertyAll<EdgeInsetsGeometry>(
-                          EdgeInsets.all(globalSpacing)),
+                          EdgeInsets.all(globalPadding)),
                     ),
                     onPressed: () =>
                         navigateToHome(context, selection[index].toLowerCase()),
