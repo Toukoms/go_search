@@ -82,7 +82,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  IconButton(onPressed: share, icon: const Icon(Icons.share, color: Colors.white,), tooltip: "partager",),
+                                  IconButton(onPressed: () {
+                                    String url = val['lien']!;
+                                    url = "https://news.google.com/${url.substring(2)}";
+
+                                    share(url);} , icon: const Icon(Icons.share, color: Colors.white,), tooltip: "partager",),
                                   TextButton(
                                       onPressed: () {},
                                       child: const Text("Plus d'info")),
@@ -166,11 +170,11 @@ class _HomeScreenState extends State<HomeScreen> {
     _stopListening();
   }
 
-  Future<void> share() async {
+  Future<void> share(String? url) async {
     await FlutterShare.share(
       title: 'Example share',
       text: 'Example share text',
-      linkUrl: 'https://flutter.dev/',
+      linkUrl: url!,
       chooserTitle: 'Example Chooser Title'
     );
   }
