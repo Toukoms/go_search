@@ -246,7 +246,7 @@ class ElementSrapped extends StatelessWidget {
             val['title']!,
             maxLines: 2,
             style: const TextStyle(
-              fontSize: 8,
+              fontSize: 10,
               color: Colors.white,
             ),
           ),

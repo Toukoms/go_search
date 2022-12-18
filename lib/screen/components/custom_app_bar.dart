@@ -10,12 +10,12 @@ class CustomAppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(
-          vertical: globalPadding + 5, horizontal: globalSpacing - 5),
+          vertical: globalPadding + 10, horizontal: globalSpacing - 5),
       decoration: const BoxDecoration(
           color: primaryColor,
           borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(globalPadding),
-              bottomRight: Radius.circular(globalPadding))),
+              bottomLeft: Radius.circular(globalPadding + 10),
+              bottomRight: Radius.circular(globalPadding + 10))),
       child: SafeArea(
         child: Column(
           children: [
