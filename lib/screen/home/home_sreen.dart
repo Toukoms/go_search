@@ -241,12 +241,12 @@ class ElementSrapped extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Image.network(val['logo']!, fit: BoxFit.cover,),
+          Image.network(val['logo']!, fit: BoxFit.contain,),
           Text(
             val['title']!,
             maxLines: 2,
             style: const TextStyle(
-              fontSize: 12,
+              fontSize: 8,
               color: Colors.white,
             ),
           ),
