@@ -21,11 +21,17 @@ class CustomAppBar extends StatelessWidget {
           children: [
             ListTile(
               leading: Image.asset('assets/images/go_share.png'),
-              trailing: IconButton(onPressed: () {}, icon: Icon(Icons.image_search, color: Colors.white,)),
+              trailing: IconButton(
+                  onPressed: () {},
+                  icon: Icon(
+                    Icons.image_search,
+                    color: Colors.white,
+                  )),
             ),
           ],
         ),
       ),
     );
   }
+
 }
