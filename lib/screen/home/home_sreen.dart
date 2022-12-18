@@ -1,12 +1,15 @@
 import 'dart:math';
 import 'package:app/constant.dart';
 import 'package:app/heyper.big.data.dart';
+import 'package:app/request.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_share/flutter_share.dart';
 import 'package:o_popup/o_popup.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:text_to_speech/text_to_speech.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../components/custom_app_bar.dart';
 
@@ -51,53 +54,92 @@ class _HomeScreenState extends State<HomeScreen> {
               ? const Text("Listening...")
               : _speechEnabled
                   ? const Text("Tap l'icon micro pour commencer")
-                  : const Text("The user has denied the use of speech recognition."),
+                  : const Text(
+                      "The user has denied the use of speech recognition."),
           Text(_lastWords),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(globalSpacing),
-              child: GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: globalSpacing,
-                mainAxisSpacing: globalSpacing,
-                children: bigData!
-                    .map(
-                      (val) => OPopupTrigger(
-                        // barrierColor: primaryColor,
-                        triggerWidget: ElementSrapped(
-                          val: val,
-                        ),
-                        popupHeader:
-                            OPopupContent.standardizedHeader(val['title']!),
-                        popupContent: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Image.network(val['image'] ?? "https://w7.pngwing.com/pngs/249/19/png-transparent-google-logo-g-suite-google-guava-google-plus-company-text-logo.png"),
-                              Text(
-                                val['date']!,
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  IconButton(onPressed: () {
-                                    String url = val['lien']!;
-                                    url = "https://news.google.com/${url.substring(2)}";
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  await Future.delayed(const Duration(seconds: 1));
+                  setState(() {});
+                },
+                child: GridView.count(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: globalSpacing,
+                  mainAxisSpacing: globalSpacing,
+                  children: bigData!
+                      .map(
+                        (val) => OPopupTrigger(
+                          // barrierColor: primaryColor,
+                          triggerWidget: ElementSrapped(
+                            val: val,
+                          ),
+                          popupHeader:
+                              OPopupContent.standardizedHeader(val['title']!),
+                          popupContent: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Image.network(val['image'] ??
+                                    "https://w7.pngwing.com/pngs/249/19/png-transparent-google-logo-g-suite-google-guava-google-plus-company-text-logo.png"),
+                                Text(
+                                  val['date']!,
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    IconButton(
+                                      onPressed: () {
+                                        String url = val['lien']!;
+                                        url =
+                                            "https://news.google.com/${url.substring(2)}";
 
-                                    share(url);} , icon: const Icon(Icons.share, color: Colors.white,), tooltip: "partager",),
-                                  TextButton(
-                                      onPressed: () {},
-                                      child: const Text("Plus d'info")),
-                                ],
-                              )
-                            ],
+                                        share(url);
+                                      },
+                                      icon: const Icon(
+                                        Icons.share,
+                                        color: Colors.white,
+                                      ),
+                                      tooltip: "partager",
+                                    ),
+                                    GestureDetector(
+                                      onTap: () async {
+                                        String url = val['lien']!;
+                                        url =
+                                            "https://news.google.com/${url.substring(2)}";
+
+                                        if (await canLaunchUrlString(url)) {
+                                          await launchUrlString(
+                                            url,
+                                            mode:
+                                                LaunchMode.externalApplication,
+                                          );
+                                        } else {
+                                          throw 'Could not launch $url';
+                                        }
+                                      },
+                                      child: const Text(
+                                        "Plus d'info",
+                                        style: TextStyle(
+                                            color: Colors.blue,
+                                            decoration:
+                                                TextDecoration.underline,
+                                            decorationColor: Colors.blue),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    )
-                    .toList(),
+                      )
+                      .toList(),
+                ),
               ),
             ),
           )
@@ -122,6 +164,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _startListening() async {
+    tts.stop();
     // Configuration de la détection de silence
     // _speechToText.setSilenceDetection(
     //   minimumSilenceDuration: Duration(seconds: 3),
@@ -145,20 +188,21 @@ class _HomeScreenState extends State<HomeScreen> {
       _lastWords = result.recognizedWords;
     });
 
-    // if (_speechToText.isNotListening && _lastWords != '') {
-    //   // fecth data from server
-    //   isLoading = true;
-    //   data = await searchIntoWiki(_lastWords);
-    //   isLoading = false;
+    if (_speechToText.isNotListening && _lastWords != '') {
+      // fecth data from server
+      isLoading = true;
+      data = await searchIntoWiki(_lastWords);
+      isLoading = false;
 
-    //   //? print(result);
-    //   if (data!["data"]["text"] == "") {
-    //     data = await searchIntoGoogle(_lastWords);
-    //   } else {
-    //     tts.speak(data!['data']['text']);
-    //   }
-    //   setState(() {});
-    // }
+      //? print(result);
+      if (data!["data"]["text"] == "") {
+        data = await searchIntoGoogle(_lastWords);
+      } else {
+        tts.speak(data!['data']['text']);
+      }
+
+      setState(() {});
+    }
   }
 
   void soundLevelListener(double level) {
@@ -172,11 +216,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> share(String? url) async {
     await FlutterShare.share(
-      title: 'Example share',
-      text: 'Example share text',
-      linkUrl: url!,
-      chooserTitle: 'Example Chooser Title'
-    );
+        title: 'Example share',
+        text: 'Example share text',
+        linkUrl: url!,
+        chooserTitle: 'Example Chooser Title');
   }
 }
 
@@ -196,19 +239,21 @@ class ElementSrapped extends StatelessWidget {
         borderRadius: BorderRadius.circular(globalPadding),
       ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          // Image.network(
-          //     "https://w7.pngwing.com/pngs/817/902/png-transparent-google-logo-google-doodle-google-search-google-company-text-logo-thumbnail.png"),
-          Text(val['title']!,
-              maxLines: 3,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.white,
-              ),),
-              Image.network(val['logo']!),
-          Text(val['date']!, style: const TextStyle(color: Colors.white38),),
-
+          Image.network(val['logo']!, fit: BoxFit.cover,),
+          Text(
+            val['title']!,
+            maxLines: 2,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.white,
+            ),
+          ),
+          Text(
+            val['date']!,
+            style: const TextStyle(color: Colors.white38),
+          ),
         ],
       ),
     );

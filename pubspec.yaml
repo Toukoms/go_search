@@ -39,6 +39,7 @@ dependencies:
   http: ^0.13.5
   o_popup: ^1.0.1
   flutter_share: ^2.0.0
+  url_launcher: ^6.1.6
   # flutter_staggered_grid_view: ^0.6.2
   # smart_grid_view: ^0.2.1
   # wikidart: ^0.0.1

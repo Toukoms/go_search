@@ -1,6 +1,4 @@
 import 'package:app/constant.dart';
-import 'package:app/screen/home/home_sreen.dart';
-import 'package:app/screen/preference/preference.dart';
 import 'package:app/screen/splash/splash_screen.dart';
 import 'package:flutter/material.dart';
 
