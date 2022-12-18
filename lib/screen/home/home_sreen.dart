@@ -1,41 +1,46 @@
+import 'dart:convert';
+import 'dart:math';
 import 'package:app/constant.dart';
+import 'package:app/heyper.big.data.dart';
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:text_to_speech/text_to_speech.dart';
 import 'package:app/request.dart';
 
-import 'components/custom_app_bar.dart';
+import '../components/custom_app_bar.dart';
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
-
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key, required this.theme}) : super(key: key);
+  final String theme;
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _HomeScreenState extends State<HomeScreen> {
   final SpeechToText _speechToText = SpeechToText();
   TextToSpeech tts = TextToSpeech();
   bool _speechEnabled = false;
   String _lastWords = '';
   Map? data; // the data from the server
+  List<Map<String, String>>? bigData; // the data from the server
   bool isLoading = false;
-  Map? actu;
+  final random = Random();
 
   @override
   void initState() {
-    fecthActuFromServer();
     _initSpeech();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Récupération des arguments passés à l'écran
+    int randomInt = random.nextInt(5) + 1;
+    print(this.widget.theme);
+    bigData = hyperBigData[this.widget.theme]?['data$randomInt'];
+    print(bigData);
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text('Speech Demo'),
-      // ),
       body: Column(
         children: <Widget>[
           CustomAppBar(),
@@ -48,7 +53,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   ? Text("Tap to begin listening")
                   : Text("The user has denied the use of speech recognition."),
           Text(_lastWords),
-          
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(globalPadding),
@@ -56,20 +60,27 @@ class _MyHomePageState extends State<MyHomePage> {
                 crossAxisCount: 2,
                 crossAxisSpacing: globalSpacing,
                 mainAxisSpacing: globalSpacing,
-                children: actuality.map((val) => Container(
+                children: bigData!
+                    .map(
+                      (val) => Container(
+                        padding: EdgeInsets.all(globalSpacing),
                         decoration: BoxDecoration(
                             color: Color.fromARGB(94, 134, 128, 128),
                             borderRadius: BorderRadius.circular(globalPadding)),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                        child: Stack(
                           children: [
-                            Text(val['title']!,
-                                style: const TextStyle(
+                            // Image.network(
+                            //     "https://w7.pngwing.com/pngs/817/902/png-transparent-google-logo-google-doodle-google-search-google-company-text-logo-thumbnail.png"),
+                            Center(
+                              child: Text(val['title']!,
+                                  style: const TextStyle(
                                     fontSize: 16,
-                                    overflow: TextOverflow.ellipsis))
+                                  )),
+                            )
                           ],
-                        )))
+                        ),
+                      ),
+                    )
                     .toList(),
               ),
             ),
@@ -86,11 +97,6 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
-  }
-
-  void fecthActuFromServer()async {
-      actu = await searchActu();
-      print(actu);
   }
 
   /// This has to happen only once per app

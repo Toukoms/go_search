@@ -1,5 +1,7 @@
 import 'package:app/constant.dart';
-import 'package:app/screen/home_sreen.dart';
+import 'package:app/screen/home/home_sreen.dart';
+import 'package:app/screen/preference/preference.dart';
+import 'package:app/screen/splash/splash_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -15,7 +17,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(primaryColor: primaryColor),
-      home: const MyHomePage(),
+      home: SplashScreen(),
     );
   }
 }
